@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Сборки Valheim 1.0 (Unity 6) нацелены на netstandard2.1, плагин — тоже. -->
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>LivingSurvivors</AssemblyName>
+    <RootNamespace>LivingSurvivors</RootNamespace>
+    <Version>0.1.0</Version>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Игра ссылается на более новые фасады System.*, чем справочный пакет SDK: это безвредно. -->
+    <NoWarn>$(NoWarn);MSB3277;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ManagedDir>$(ValheimInstall)/valheim_Data/Managed</ManagedDir>
+    <BepInExCoreDir Condition="'$(BepInExCoreDir)' == ''">$(ValheimInstall)/BepInEx/core</BepInExCoreDir>
+    <PluginDeployDir Condition="'$(PluginDeployDir)' == ''">$(ValheimInstall)/BepInEx/plugins/LivingSurvivors</PluginDeployDir>
+  </PropertyGroup>
+
+  <!-- Понятная ошибка вместо десятков «тип не найден», если путь к игре не задан. -->
+  <Target Name="CheckValheimInstall" BeforeTargets="ResolveAssemblyReferences;CoreCompile">
+    <Error Condition="'$(ValheimInstall)' == '' Or !Exists('$(ManagedDir)/assembly_valheim.dll')"
+           Text="Не найден assembly_valheim.dll. Задайте путь к Valheim: скопируйте Directory.Build.props.user.example в Directory.Build.props.user и поправьте ValheimInstall (или задайте переменную окружения VALHEIM_INSTALL). Сейчас ValheimInstall='$(ValheimInstall)'." />
+    <Error Condition="!Exists('$(BepInExCoreDir)/BepInEx.dll')"
+           Text="Не найден BepInEx.dll в '$(BepInExCoreDir)'. Установите BepInExPack Valheim (5.4.2350 или новее) или задайте BepInExCoreDir в Directory.Build.props.user." />
+  </Target>
+
+  <ItemGroup>
+    <!-- Игровые сборки: assembly_valheim, assembly_utils и т.д., все модули UnityEngine. -->
+    <Reference Include="$(ManagedDir)/assembly_*.dll" Private="false" />
+    <Reference Include="$(ManagedDir)/UnityEngine*.dll" Private="false" />
+    <Reference Include="$(ManagedDir)/SoftReferenceableAssets.dll" Private="false"
+               Condition="Exists('$(ManagedDir)/SoftReferenceableAssets.dll')" />
+    <Reference Include="$(ManagedDir)/Unity.TextMeshPro.dll" Private="false"
+               Condition="Exists('$(ManagedDir)/Unity.TextMeshPro.dll')" />
+
+    <!-- BepInEx и Harmony (HarmonyX входит в BepInEx 5). -->
+    <Reference Include="$(BepInExCoreDir)/BepInEx.dll" Private="false" />
+    <Reference Include="$(BepInExCoreDir)/0Harmony.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- Автоматически кладём собранный плагин в BepInEx/plugins/LivingSurvivors. -->
+  <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(ValheimInstall)' != ''">
+    <MakeDir Directories="$(PluginDeployDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginDeployDir)" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(PluginDeployDir)"
+          Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+    <Message Importance="high" Text="LivingSurvivors -> $(PluginDeployDir)" />
+  </Target>
+
+</Project>

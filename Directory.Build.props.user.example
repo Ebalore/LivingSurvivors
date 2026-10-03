@@ -1,0 +1,17 @@
+<Project>
+  <!--
+    Скопируйте этот файл в Directory.Build.props.user (без .example) и поправьте пути.
+    Файл .user в .gitignore и не попадает в репозиторий.
+  -->
+  <PropertyGroup>
+    <!-- Папка с игрой. В ней должны быть valheim_Data/Managed и установленный BepInEx. -->
+    <ValheimInstall>C:\Program Files (x86)\Steam\steamapps\common\Valheim</ValheimInstall>
+
+    <!--
+      Если играете через r2modman / Thunderstore Mod Manager, BepInEx лежит в папке профиля.
+      Тогда раскомментируйте и укажите свои пути:
+    -->
+    <!-- <BepInExCoreDir>C:\Users\ВАШЕ_ИМЯ\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\Default\BepInEx\core</BepInExCoreDir> -->
+    <!-- <PluginDeployDir>C:\Users\ВАШЕ_ИМЯ\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\Default\BepInEx\plugins\LivingSurvivors</PluginDeployDir> -->
+  </PropertyGroup>
+</Project>

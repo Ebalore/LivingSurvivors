@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    Путь к установке Valheim берётся (по приоритету):
+      1) из файла Directory.Build.props.user (скопируйте из Directory.Build.props.user.example),
+      2) из переменной окружения VALHEIM_INSTALL.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.props.user"
+          Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.props.user')" />
+
+  <PropertyGroup Condition="'$(ValheimInstall)' == '' And '$(VALHEIM_INSTALL)' != ''">
+    <ValheimInstall>$(VALHEIM_INSTALL)</ValheimInstall>
+  </PropertyGroup>
+</Project>
